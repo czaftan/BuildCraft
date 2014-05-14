@@ -45,6 +45,9 @@ public class TileEngineStone extends TileEngineWithInventory {
 
 	@Override
 	public ResourceLocation getBaseTexture() {
+		checkRedstonePower();
+		if (isRedstonePowered)
+			return BASE_ON_TEXTURES[1];
 		return BASE_TEXTURES[1];
 	}
 

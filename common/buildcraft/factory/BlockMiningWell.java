@@ -15,6 +15,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import cpw.mods.fml.relauncher.Side;
@@ -25,10 +26,11 @@ import net.minecraftforge.common.util.ForgeDirection;
 import buildcraft.BuildCraftFactory;
 import buildcraft.core.BlockBuildCraft;
 import buildcraft.core.utils.Utils;
+import buildcraft.silicon.TileLaserTableBase;
 
 public class BlockMiningWell extends BlockBuildCraft {
 
-	IIcon textureFront, textureSides, textureBack, textureTop;
+	private IIcon textureFront, textureSides, textureBack, textureTop, textureTopOn, textureFrontOn;
 
 	public BlockMiningWell() {
 		super(Material.ground);
@@ -39,6 +41,31 @@ public class BlockMiningWell extends BlockBuildCraft {
 		// TODO: set proper sound
 		//setStepSound(soundStoneFootstep);
 	}
+	
+	@Override
+	public IIcon getIcon(IBlockAccess block, int x, int y, int z, int f) {
+		TileMiningWell tile = ((TileMiningWell) block.getTileEntity(x, y, z));
+		int meta = tile.getBlockMetadata();
+		tile.checkRedstonePower();
+		if (f == 3 && meta == f) {
+			if (tile.isRedstonePowered())
+				return textureFrontOn;
+			return textureFront;
+		}
+		if (f == 1) {
+			if (tile.isRedstonePowered())
+				return textureTopOn;
+			return textureTop;
+		} else if (f == meta) {
+			if (tile.isRedstonePowered())
+				return textureFrontOn;
+			return textureFront;
+		}
+		else if (meta >= 0 && meta < 6 && ForgeDirection.values()[meta].getOpposite().ordinal() == f)
+			return textureBack;
+		return textureSides;
+	}
+
 
 	@Override
 	public IIcon getIcon(int i, int j) {
@@ -88,10 +115,22 @@ public class BlockMiningWell extends BlockBuildCraft {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void registerBlockIcons(IIconRegister par1IconRegister) {
-	    textureFront = par1IconRegister.registerIcon("buildcraft:miningwell_front");
-        textureSides = par1IconRegister.registerIcon("buildcraft:miningwell_side");
-        textureBack = par1IconRegister.registerIcon("buildcraft:miningwell_back");
-        textureTop = par1IconRegister.registerIcon("buildcraft:miningwell_top");
+	public void registerBlockIcons(IIconRegister par1IconRegister)
+	{
+		textureFront = par1IconRegister.registerIcon("buildcraft:miningwell_front");
+		textureSides = par1IconRegister.registerIcon("buildcraft:miningwell_side");
+		textureBack = par1IconRegister.registerIcon("buildcraft:miningwell_back");
+		textureTop = par1IconRegister.registerIcon("buildcraft:miningwell_top");
+		textureTopOn = par1IconRegister.registerIcon("buildcraft:miningwell_top_on");
+		textureFrontOn = par1IconRegister.registerIcon("buildcraft:miningwell_front_on");
+	}
+	
+	@Override
+	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
+		super.onNeighborBlockChange(world, x, y, z, block);
+		TileEntity tile = world.getTileEntity(x, y, z);
+		if (tile instanceof TileMiningWell) {
+			((TileMiningWell) tile).onNeighborBlockChange(block);
+		}
 	}
 }

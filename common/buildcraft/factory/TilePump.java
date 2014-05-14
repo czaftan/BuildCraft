@@ -64,7 +64,7 @@ public class TilePump extends TileBuildCraft implements IMachine, IFluidHandler 
 	private SafeTimeTracker timer = new SafeTimeTracker(REBUID_DELAY);
 	private int tick = Utils.RANDOM.nextInt();
 	private int numFluidBlocksFound = 0;
-	private boolean powered = false;
+	public boolean powered = false;
 
 	@MjBattery(maxCapacity = 100, maxReceivedPerCycle = 15, minimumConsumption = 1)
 	private double mjStored = 0;
@@ -73,7 +73,7 @@ public class TilePump extends TileBuildCraft implements IMachine, IFluidHandler 
 	public void updateEntity() {
 		super.updateEntity();
 
-		if (powered) {
+		if (!powered) {
 			pumpLayerQueues.clear();
 			destroyTube();
 		} else {
@@ -86,7 +86,7 @@ public class TilePump extends TileBuildCraft implements IMachine, IFluidHandler 
 
 		pushToConsumers();
 
-		if (powered) {
+		if (!powered) {
 			return;
 		}
 
@@ -152,6 +152,7 @@ public class TilePump extends TileBuildCraft implements IMachine, IFluidHandler 
 				sendNetworkUpdate();
 			}
 		}
+		
 	}
 
 	private boolean isBlocked(int x, int y, int z) {

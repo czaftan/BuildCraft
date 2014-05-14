@@ -68,7 +68,7 @@ public class TileFloodGate extends TileBuildCraft implements IFluidHandler {
 			return;
 		}
 
-		if (powered) {
+		if (!powered) {
 			return;
 		}
 
@@ -218,6 +218,14 @@ public class TileFloodGate extends TileBuildCraft implements IFluidHandler {
 	}
 
 	public void onNeighborBlockChange(Block block) {
+		refreshPowered();
+	}
+	
+	public boolean isPowered() {
+		return powered;
+	}
+	
+	public void refreshPowered() {
 		boolean p = worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord);
 		if (powered != p) {
 			powered = p;

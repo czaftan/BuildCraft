@@ -21,6 +21,9 @@ public class TileEngineWood extends TileEngine {
 
 	@Override
 	public ResourceLocation getBaseTexture() {
+		checkRedstonePower();
+		if (isRedstonePowered)
+			return BASE_ON_TEXTURES[0];
 		return BASE_TEXTURES[0];
 	}
 

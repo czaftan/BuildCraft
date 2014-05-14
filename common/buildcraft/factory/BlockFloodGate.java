@@ -15,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import cpw.mods.fml.relauncher.Side;
@@ -26,9 +27,7 @@ import buildcraft.core.utils.Utils;
 
 public class BlockFloodGate extends BlockBuildCraft {
 
-	private IIcon textureTop;
-	private IIcon textureBottom;
-	private IIcon textureSide;
+	private IIcon textureTop, textureBottom, textureSide, textureTopOn;
 
 	public BlockFloodGate() {
 		super(Material.iron);
@@ -37,6 +36,20 @@ public class BlockFloodGate extends BlockBuildCraft {
 	@Override
 	public TileEntity createNewTileEntity(World world, int metadata) {
 		return new TileFloodGate();
+	}
+	
+	@Override
+	public IIcon getIcon(IBlockAccess block, int x, int y, int z, int f) {
+		if (f == 1) {
+			TileFloodGate tile = ((TileFloodGate) block.getTileEntity(x, y, z));
+			tile.refreshPowered();
+			if (tile.isPowered())
+				return textureTopOn;
+			else
+				return textureTop;
+		} else if (f == 1)
+			return textureTop;
+		return textureSide;
 	}
 
 	@Override
@@ -95,6 +108,7 @@ public class BlockFloodGate extends BlockBuildCraft {
 	@SideOnly(Side.CLIENT)
 	public void registerBlockIcons(IIconRegister par1IconRegister) {
 		textureTop = par1IconRegister.registerIcon("buildcraft:floodgate_top");
+		textureTopOn = par1IconRegister.registerIcon("buildcraft:floodgate_top_on");
 		textureBottom = par1IconRegister.registerIcon("buildcraft:floodgate_bottom");
 		textureSide = par1IconRegister.registerIcon("buildcraft:floodgate_side");
 	}

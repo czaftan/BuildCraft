@@ -10,8 +10,10 @@ package buildcraft.factory;
 
 import java.util.List;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import buildcraft.BuildCraftCore;
@@ -26,6 +28,7 @@ import buildcraft.core.utils.Utils;
 public class TileMiningWell extends TileBuildCraft implements IMachine {
 
 	boolean isDigging = true;
+	private boolean isRedstonePowered = false;
 
 	@MjBattery(maxCapacity = 1000, maxReceivedPerCycle = BuildCraftFactory.MINING_MJ_COST_PER_BLOCK, minimumConsumption = 1)
 	private double mjStored = 0;
@@ -37,6 +40,9 @@ public class TileMiningWell extends TileBuildCraft implements IMachine {
 	@Override
 	public void updateEntity () {
 		float mj = BuildCraftFactory.MINING_MJ_COST_PER_BLOCK * BuildCraftFactory.miningMultiplier;
+		
+		if (!isRedstonePowered)
+			return;
 
 		if (mjStored < mj) {
 			return;
@@ -129,5 +135,29 @@ public class TileMiningWell extends TileBuildCraft implements IMachine {
 	@Override
 	public boolean allowAction(IAction action) {
 		return false;
+	}
+	
+	@Override
+	public void readFromNBT(NBTTagCompound data) {
+		super.readFromNBT(data);
+		isRedstonePowered = data.getBoolean("isRedstonePowered");
+	}
+
+	@Override
+	public void writeToNBT(NBTTagCompound data) {
+		super.writeToNBT(data);
+		data.setBoolean("isRedstonePowered", isRedstonePowered);
+	}
+	
+	public void checkRedstonePower() {
+		isRedstonePowered = worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord);
+	}
+	
+	public void onNeighborBlockChange(Block block) {
+		checkRedstonePower();
+	}
+	
+	public boolean isRedstonePowered() {
+		return isRedstonePowered;
 	}
 }

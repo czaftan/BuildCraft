@@ -20,6 +20,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import cpw.mods.fml.relauncher.Side;
@@ -75,6 +76,18 @@ public class BlockLaserTable extends BlockContainer {
 		Utils.preDestroyBlock(world, x, y, z);
 		super.breakBlock(world, x, y, z, block, par6);
 	}
+	
+	@Override
+	public IIcon getIcon(IBlockAccess block, int x, int y, int z, int f) {
+		TileLaserTableBase tile = ((TileLaserTableBase) block.getTileEntity(x, y, z));
+
+		int s = f > 1 ? 2 : f;
+		tile.checkRedstonePower();
+		if (tile.isRedstonePowered && f == 1)
+			s += 2;
+		int meta = tile.getBlockMetadata();
+		return icons[meta][s];
+	}
 
 	@Override
 	public IIcon getIcon(int side, int meta) {
@@ -117,21 +130,33 @@ public class BlockLaserTable extends BlockContainer {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void registerBlockIcons(IIconRegister par1IconRegister) {
-		icons = new IIcon[3][];
-		icons[0] = new IIcon[3];
-		icons[1] = new IIcon[3];
-		icons[2] = new IIcon[3];
+		icons = new IIcon[4][];
+		icons[0] = new IIcon[4];
+		icons[1] = new IIcon[4];
+		icons[2] = new IIcon[4];
 
 		icons[0][0] = par1IconRegister.registerIcon("buildcraft:assemblytable_bottom");
 		icons[0][1] = par1IconRegister.registerIcon("buildcraft:assemblytable_top");
 		icons[0][2] = par1IconRegister.registerIcon("buildcraft:assemblytable_side");
+		icons[0][3] = par1IconRegister.registerIcon("buildcraft:assemblytable_top_on");
 
 		icons[1][0] = par1IconRegister.registerIcon("buildcraft:advworkbenchtable_bottom");
 		icons[1][1] = par1IconRegister.registerIcon("buildcraft:advworkbenchtable_top");
 		icons[1][2] = par1IconRegister.registerIcon("buildcraft:advworkbenchtable_side");
+		icons[1][3] = par1IconRegister.registerIcon("buildcraft:advworkbenchtable_top_on");
 
 		icons[2][0] = par1IconRegister.registerIcon("buildcraft:integrationtable_bottom");
 		icons[2][1] = par1IconRegister.registerIcon("buildcraft:integrationtable_top");
 		icons[2][2] = par1IconRegister.registerIcon("buildcraft:integrationtable_side");
+		icons[2][3] = par1IconRegister.registerIcon("buildcraft:integrationtable_top_on");
+	}
+	
+	@Override
+	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
+		super.onNeighborBlockChange(world, x, y, z, block);
+		TileEntity tile = world.getTileEntity(x, y, z);
+		if (tile instanceof TileLaserTableBase) {
+			((TileLaserTableBase) tile).onNeighborBlockChange(block);
+		}
 	}
 }

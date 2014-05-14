@@ -46,6 +46,13 @@ public abstract class TileEngine extends TileBuildCraft implements IPowerRecepto
 			new ResourceLocation(DefaultProps.TEXTURE_PATH_BLOCKS + "/base_iron.png"),
 			new ResourceLocation(DefaultProps.TEXTURE_PATH_BLOCKS + "/base_creative.png")
 	};
+	
+	public static final ResourceLocation[] BASE_ON_TEXTURES = new ResourceLocation[]{
+		new ResourceLocation(DefaultProps.TEXTURE_PATH_BLOCKS + "/base_wood_on.png"),
+		new ResourceLocation(DefaultProps.TEXTURE_PATH_BLOCKS + "/base_stone_on.png"),
+		new ResourceLocation(DefaultProps.TEXTURE_PATH_BLOCKS + "/base_iron_on.png"),
+		new ResourceLocation(DefaultProps.TEXTURE_PATH_BLOCKS + "/base_creative_on.png")
+};
 
 	public static final ResourceLocation[] CHAMBER_TEXTURES = new ResourceLocation[]{
 			new ResourceLocation(DefaultProps.TEXTURE_PATH_BLOCKS + "/chamber_wood.png"),

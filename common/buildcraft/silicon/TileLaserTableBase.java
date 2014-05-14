@@ -8,6 +8,7 @@
  */
 package buildcraft.silicon;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
@@ -33,6 +34,7 @@ public abstract class TileLaserTableBase extends TileBuildCraft implements ILase
 	private double energy = 0;
 	private int recentEnergyAverage;
 	private AverageUtil recentEnergyAverageUtil = new AverageUtil(20);
+	public boolean isRedstonePowered = false;
 
 	@Override
 	public void updateEntity() {
@@ -87,7 +89,8 @@ public abstract class TileLaserTableBase extends TileBuildCraft implements ILase
 
 	@Override
 	public boolean isInvalidTarget() {
-		return isInvalid();
+		checkRedstonePower();
+		return isInvalid() || !isRedstonePowered;
 	}
 
 	@Override
@@ -148,6 +151,7 @@ public abstract class TileLaserTableBase extends TileBuildCraft implements ILase
 		super.writeToNBT(nbt);
 		inv.writeToNBT(nbt, "inv");
 		nbt.setDouble("energy", energy);
+		isRedstonePowered = nbt.getBoolean("isRedstonePowered");
 	}
 
 	@Override
@@ -155,6 +159,7 @@ public abstract class TileLaserTableBase extends TileBuildCraft implements ILase
 		super.readFromNBT(nbt);
 		inv.readFromNBT(nbt, "inv");
 		energy = nbt.getDouble("energy");
+		nbt.setBoolean("isRedstonePowered", isRedstonePowered);
 	}
 
 	public void getGUINetworkData(int id, int data) {
@@ -225,5 +230,13 @@ public abstract class TileLaserTableBase extends TileBuildCraft implements ILase
 		} else if (action == BuildCraftCore.actionOff) {
 			lastMode = ActionMachineControl.Mode.Off;
 		}
+	}
+	
+	public void checkRedstonePower() {
+		isRedstonePowered = worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord);
+	}
+	
+	public void onNeighborBlockChange(Block block) {
+		checkRedstonePower();
 	}
 }

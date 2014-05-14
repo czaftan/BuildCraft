@@ -64,6 +64,9 @@ public class TileEngineIron extends TileEngineWithInventory implements IFluidHan
 
 	@Override
 	public ResourceLocation getBaseTexture() {
+		checkRedstonePower();
+		if (isRedstonePowered)
+			return BASE_ON_TEXTURES[2];
 		return BASE_TEXTURES[2];
 	}
 
@@ -108,16 +111,16 @@ public class TileEngineIron extends TileEngineWithInventory implements IFluidHan
 			return Math.max(0.07f * getHeatLevel(), 0.01f);
 		}
 		switch (getEnergyStage()) {
-			case BLUE:
-				return 0.04F;
-			case GREEN:
-				return 0.05F;
-			case YELLOW:
-				return 0.06F;
-			case RED:
-				return 0.07F;
-			default:
-				return 0;
+		case BLUE:
+			return 0.04F;
+		case GREEN:
+			return 0.05F;
+		case YELLOW:
+			return 0.06F;
+		case RED:
+			return 0.07F;
+		default:
+			return 0;
 		}
 	}
 
@@ -283,46 +286,46 @@ public class TileEngineIron extends TileEngineWithInventory implements IFluidHan
 	public void getGUINetworkData(int id, int value) {
 		super.getGUINetworkData(id, value);
 		switch (id) {
-			// Fluid Fuel ID
-			case 15:
-				if (tankFuel.getFluid() == null) {
-					tankFuel.setFluid(new FluidStack(value, 0));
-				} else {
-					tankFuel.getFluid().fluidID = value;
-				}
-				break;
-			// Fluid Coolant ID
-			case 16:
-				if (tankCoolant.getFluid() == null) {
-					tankCoolant.setFluid(new FluidStack(value, 0));
-				} else {
-					tankCoolant.getFluid().fluidID = value;
-				}
-				break;
-			// Fluid Fuel amount
-			case 17:
-				if (tankFuel.getFluid() == null) {
-					tankFuel.setFluid(new FluidStack(0, value));
-				} else {
-					tankFuel.getFluid().amount = value;
-				}
-				break;
-			// Fluid Coolant amount
-			case 18:
-				if (tankCoolant.getFluid() == null) {
-					tankCoolant.setFluid(new FluidStack(0, value));
-				} else {
-					tankCoolant.getFluid().amount = value;
-				}
-				break;
-			//Fluid Fuel color
-			case 19:
-				tankFuel.colorRenderCache = value;
-				break;
-			//Fluid Coolant color
-			case 20:
-				tankCoolant.colorRenderCache = value;
-				break;
+		// Fluid Fuel ID
+		case 15:
+			if (tankFuel.getFluid() == null) {
+				tankFuel.setFluid(new FluidStack(value, 0));
+			} else {
+				tankFuel.getFluid().fluidID = value;
+			}
+			break;
+		// Fluid Coolant ID
+		case 16:
+			if (tankCoolant.getFluid() == null) {
+				tankCoolant.setFluid(new FluidStack(value, 0));
+			} else {
+				tankCoolant.getFluid().fluidID = value;
+			}
+			break;
+		// Fluid Fuel amount
+		case 17:
+			if (tankFuel.getFluid() == null) {
+				tankFuel.setFluid(new FluidStack(0, value));
+			} else {
+				tankFuel.getFluid().amount = value;
+			}
+			break;
+		// Fluid Coolant amount
+		case 18:
+			if (tankCoolant.getFluid() == null) {
+				tankCoolant.setFluid(new FluidStack(0, value));
+			} else {
+				tankCoolant.getFluid().amount = value;
+			}
+			break;
+		// Fluid Fuel color
+		case 19:
+			tankFuel.colorRenderCache = value;
+			break;
+		// Fluid Coolant color
+		case 20:
+			tankCoolant.colorRenderCache = value;
+			break;
 		}
 	}
 

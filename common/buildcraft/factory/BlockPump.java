@@ -15,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import cpw.mods.fml.relauncher.Side;
@@ -26,9 +27,7 @@ import buildcraft.core.utils.Utils;
 
 public class BlockPump extends BlockBuildCraft {
 
-	private IIcon textureTop;
-	private IIcon textureBottom;
-	private IIcon textureSide;
+	private IIcon textureTop, textureTopOn, textureSide, textureBottom;
 
 	public BlockPump() {
 		super(Material.iron);
@@ -37,6 +36,21 @@ public class BlockPump extends BlockBuildCraft {
 	@Override
 	public TileEntity createNewTileEntity(World world, int metadata) {
 		return new TilePump();
+	}
+	
+	@Override
+	public IIcon getIcon(IBlockAccess block, int x, int y, int z, int f) {
+		if (f == 1) {
+			TilePump tile = ((TilePump) block.getTileEntity(x, y, z));
+			if (tile.powered)
+				return textureTopOn;
+			else
+				return textureTop;
+		} else if (f == 1)
+			return textureTop;
+		else if (f == 0)
+			return textureBottom;
+		return textureSide;
 	}
 
 	@Override
@@ -98,5 +112,6 @@ public class BlockPump extends BlockBuildCraft {
 		textureTop = par1IconRegister.registerIcon("buildcraft:pump_top");
 		textureBottom = par1IconRegister.registerIcon("buildcraft:pump_bottom");
 		textureSide = par1IconRegister.registerIcon("buildcraft:pump_side");
+		textureTopOn = par1IconRegister.registerIcon("buildcraft:pump_top_on");
 	}
 }

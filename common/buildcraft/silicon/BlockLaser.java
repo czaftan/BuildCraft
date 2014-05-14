@@ -10,6 +10,7 @@ package buildcraft.silicon;
 
 import java.util.List;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -30,6 +31,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import buildcraft.core.CreativeTabBuildCraft;
 import buildcraft.core.ICustomHighlight;
+import buildcraft.factory.TilePump;
 
 public class BlockLaser extends BlockContainer implements ICustomHighlight {
 
@@ -43,7 +45,7 @@ public class BlockLaser extends BlockContainer implements ICustomHighlight {
 	};
 
 	@SideOnly(Side.CLIENT)
-	private IIcon textureTop, textureBottom, textureSide;
+	private IIcon textureTop, textureTopOn, textureBottom, textureSide;
 
 	public BlockLaser() {
 		super(Material.iron);
@@ -118,6 +120,21 @@ public class BlockLaser extends BlockContainer implements ICustomHighlight {
 	public TileEntity createNewTileEntity(World world, int metadata) {
 		return new TileLaser();
 	}
+	
+	public IIcon getIcon(IBlockAccess block, int x, int y, int z, int f) {
+		TileLaser tile = ((TileLaser) block.getTileEntity(x, y, z));
+		int meta = tile.getBlockMetadata();
+		if (f == ForgeDirection.values()[meta].getOpposite().ordinal())
+			return textureBottom;
+		if (f == meta) {
+			tile.checkRedstonePower();
+			if (tile.isRedstonePowered)
+				return textureTopOn;
+			else
+				return textureTop;
+		}
+		return textureSide;
+	}
 
 	@Override
 	public IIcon getIcon(int i, int j) {
@@ -148,6 +165,7 @@ public class BlockLaser extends BlockContainer implements ICustomHighlight {
 	@SideOnly(Side.CLIENT)
 	public void registerBlockIcons(IIconRegister par1IconRegister) {
 		textureTop = par1IconRegister.registerIcon("buildcraft:laser_top");
+		textureTopOn = par1IconRegister.registerIcon("buildcraft:laser_top_on");
 		textureBottom = par1IconRegister.registerIcon("buildcraft:laser_bottom");
 		textureSide = par1IconRegister.registerIcon("buildcraft:laser_side");
 	}
@@ -155,5 +173,14 @@ public class BlockLaser extends BlockContainer implements ICustomHighlight {
 	@Override
 	public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side) {
 		return false;
+	}
+	
+	@Override
+	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
+		super.onNeighborBlockChange(world, x, y, z, block);
+		TileEntity tile = world.getTileEntity(x, y, z);
+		if (tile instanceof TileLaser) {
+			((TileLaser) tile).onNeighborBlockChange(block);
+		}
 	}
 }

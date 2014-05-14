@@ -95,6 +95,8 @@ public class TileQuarry extends TileAbstractBuilder implements IMachine {
 	private boolean frameProducer = true;
 
 	private NBTTagCompound initNBT = null;
+	
+	public boolean isRedstonePowered = false;
 
 	public TileQuarry () {
 		box.kind = Kind.STRIPES;
@@ -147,6 +149,9 @@ public class TileQuarry extends TileAbstractBuilder implements IMachine {
 	@Override
 	public void updateEntity() {
 		super.updateEntity();
+		
+		if (!isRedstonePowered)
+			return;
 
 		if (worldObj.isRemote) {
 			if (stage != Stage.DONE) {
@@ -858,5 +863,13 @@ public class TileQuarry extends TileAbstractBuilder implements IMachine {
 	@Override
 	public Box getBox() {
 		return box;
+	}
+	
+	public void checkRedstonePower() {
+		isRedstonePowered = worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord);
+	}
+	
+	public void onNeighborBlockChange(Block block) {
+		checkRedstonePower();
 	}
 }

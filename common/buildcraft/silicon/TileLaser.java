@@ -11,6 +11,7 @@ package buildcraft.silicon;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
@@ -53,6 +54,8 @@ public class TileLaser extends TileBuildCraft implements IActionReceptor, IMachi
 	@NetworkData
 	private double powerAverage = 0;
 	private final double[] power = new double[POWER_AVERAGING];
+	
+	public boolean isRedstonePowered = false;
 
 
 	@Override
@@ -80,6 +83,11 @@ public class TileLaser extends TileBuildCraft implements IActionReceptor, IMachi
 			return;
 		}
 
+		if (!isRedstonePowered) {
+			removeLaser();
+			return;
+		}
+		
 		// Check for any available tables at a regular basis
 		if (canFindTable()) {
 			findTable();
@@ -262,6 +270,7 @@ public class TileLaser extends TileBuildCraft implements IActionReceptor, IMachi
 		super.readFromNBT(nbttagcompound);
 
 		mjStored = nbttagcompound.getDouble("mjStored");
+		isRedstonePowered = nbttagcompound.getBoolean("isRedstonePowered");
 	}
 
 	@Override
@@ -269,6 +278,7 @@ public class TileLaser extends TileBuildCraft implements IActionReceptor, IMachi
 		super.writeToNBT(nbttagcompound);
 
 		nbttagcompound.setDouble("mjStored", mjStored);
+		nbttagcompound.setBoolean("isRedstonePowered", isRedstonePowered);
 	}
 
 	@Override
@@ -334,5 +344,13 @@ public class TileLaser extends TileBuildCraft implements IActionReceptor, IMachi
 	@Override
 	public AxisAlignedBB getRenderBoundingBox() {
 		return new Box(this).extendToEncompass(laser.tail).getBoundingBox();
+	}
+	
+	public void checkRedstonePower() {
+		isRedstonePowered = worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord);
+	}
+	
+	public void onNeighborBlockChange(Block block) {
+		checkRedstonePower();
 	}
 }

@@ -35,9 +35,7 @@ import buildcraft.core.utils.Utils;
 
 public class BlockQuarry extends BlockBuildCraft {
 
-	IIcon textureTop;
-	IIcon textureFront;
-	IIcon textureSide;
+	private IIcon textureTop, textureFront, textureSide, textureFrontOn;
 
 	public BlockQuarry() {
 		super(Material.iron);
@@ -61,6 +59,21 @@ public class BlockQuarry extends BlockBuildCraft {
 				((TileQuarry) tile).placedBy = (EntityPlayer) entityliving;
 			}
 		}
+	}
+	
+	@Override
+	public IIcon getIcon(IBlockAccess block, int x, int y, int z, int f) {
+		TileQuarry tile = ((TileQuarry) block.getTileEntity(x, y, z));
+		tile.checkRedstonePower();
+		int meta = tile.getBlockMetadata();
+		if ((f == 0 && meta == 3) || (f == meta && meta > 0)) {
+			if (tile.isRedstonePowered)
+				return textureFrontOn;
+			else
+				return textureFront;
+		} else if (f == 1)
+			return textureTop;
+		return textureSide;
 	}
 
 	@Override
@@ -216,6 +229,7 @@ public class BlockQuarry extends BlockBuildCraft {
 		textureSide = par1IconRegister.registerIcon("buildcraft:quarry_side");
 		textureTop = par1IconRegister.registerIcon("buildcraft:quarry_top");
 		textureFront = par1IconRegister.registerIcon("buildcraft:quarry_front");
+		textureFrontOn = par1IconRegister.registerIcon("buildcraft:quarry_front_on");
 	}
 
 	@Override
@@ -231,5 +245,14 @@ public class BlockQuarry extends BlockBuildCraft {
 	@Override
 	public int getLightValue(IBlockAccess world, int x, int y, int z) {
 		return 1;
+	}
+	
+	@Override
+	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
+		super.onNeighborBlockChange(world, x, y, z, block);
+		TileEntity tile = world.getTileEntity(x, y, z);
+		if (tile instanceof TileQuarry) {
+			((TileQuarry) tile).onNeighborBlockChange(block);
+		}
 	}
 }
